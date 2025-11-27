@@ -129,6 +129,39 @@ def run_tournament(games_per_agent: int = 10, mode: str = 'classic'):
             f"{r['Avg Time']:.2f}"
         ))
     print("=" * 95)
+    
+    # Generate Plot
+    plot_results(results)
+
+
+def plot_results(results: List[Dict[str, Any]]):
+    """Generate Score vs Time plot."""
+    try:
+        import matplotlib.pyplot as plt
+        
+        agents = [r['Agent'] for r in results]
+        scores = [r['Avg Score'] for r in results]
+        times = [r['Avg Time'] for r in results]
+        
+        plt.figure(figsize=(10, 6))
+        plt.scatter(times, scores, color='blue', s=100)
+        
+        # Add labels
+        for i, agent in enumerate(agents):
+            plt.annotate(agent, (times[i], scores[i]), xytext=(5, 5), textcoords='offset points')
+            
+        plt.title('AI Performance: Score vs Time')
+        plt.xlabel('Average Time per Game (s)')
+        plt.ylabel('Average Score')
+        plt.grid(True, linestyle='--', alpha=0.7)
+        
+        # Save plot
+        plt.savefig('benchmark_results.png')
+        print("\n📊 Plot saved to 'benchmark_results.png'")
+        
+    except ImportError:
+        print("\n⚠️ Matplotlib not found. Skipping plot generation.")
+        print("To enable plotting, install matplotlib: pip install matplotlib")
 
 
 if __name__ == "__main__":

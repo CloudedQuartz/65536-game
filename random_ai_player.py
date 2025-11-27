@@ -117,9 +117,10 @@ class RandomAIPlayer(Player):
             print("GAME OVER")
             print("=" * 50)
         
-        print(f"Final Score: {state.score:,}")
-        print(f"Max Tile: {state.get_max_tile()}")
-        print(f"Total Moves: {state.move_count}")
+        if self.verbose:
+            print(f"Final Score: {state.score:,}")
+            print(f"Max Tile: {state.get_max_tile()}")
+            print(f"Total Moves: {state.move_count}")
         
         if state.won:
             print("🎉 YOU WON! Reached 65536!")
