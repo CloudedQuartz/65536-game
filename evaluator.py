@@ -337,25 +337,28 @@ def evaluate_state(state: GameState, weights: dict = None) -> float:
     
     score = 0.0
     
-    if 'position' in weights:
-        score += get_position_weights(state) * weights['position']
-        
-    if 'gradient' in weights:
-        score += get_gradient_score(state) * weights['gradient']
+    # Only calculate metrics that have non-zero weights
+    # This optimization is crucial for search speed
     
-    if 'monotonicity' in weights:
+    if weights.get('gradient', 0) != 0:
+        score += get_gradient_score(state) * weights['gradient']
+        
+    if weights.get('empty_cells', 0) != 0:
+        score += state.get_empty_count() * weights['empty_cells']
+        
+    if weights.get('position', 0) != 0:
+        score += get_position_weights(state) * weights['position']
+    
+    if weights.get('monotonicity', 0) != 0:
         score += get_monotonicity(state) * weights['monotonicity']
     
-    if 'smoothness' in weights:
+    if weights.get('smoothness', 0) != 0:
         score += get_smoothness(state) * weights['smoothness']
     
-    if 'empty_cells' in weights:
-        score += state.get_empty_count() * weights['empty_cells']
-    
-    if 'merge_potential' in weights:
+    if weights.get('merge_potential', 0) != 0:
         score += get_merge_potential(state) * weights['merge_potential']
     
-    if 'corner' in weights:
+    if weights.get('corner', 0) != 0:
         score += get_corner_weight(state) * weights['corner']
     
     return score
