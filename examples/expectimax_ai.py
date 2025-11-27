@@ -13,9 +13,9 @@ import evaluator
 
 
 class ExpectimaxAI(Player):
-    """AI using Expectimax algorithm (depth 2 recommended)."""
+    """AI using Expectimax algorithm (depth 3 recommended)."""
     
-    def __init__(self, game: Game, depth: int = 2):
+    def __init__(self, game: Game, depth: int = 3):
         self.game = game
         self.depth = depth
     

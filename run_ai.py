@@ -47,6 +47,13 @@ def discover_players() -> Dict[str, tuple]:
             if file.stem != '__init__':
                 python_files.append(f'examples.{file.stem}')
     
+    # Agents directory
+    agents_dir = root / 'agents'
+    if agents_dir.exists():
+        for file in agents_dir.glob('*.py'):
+            if file.stem != '__init__':
+                python_files.append(f'agents.{file.stem}')
+    
     # Try importing each module and finding Player subclasses
     for module_name in python_files:
         try:
