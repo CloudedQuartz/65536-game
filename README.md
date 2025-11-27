@@ -185,20 +185,46 @@ Both examples are intentionally simple to demonstrate the core concepts.
 
 ## Evaluation Helpers
 
-The `GameState` class provides several evaluation helpers for AI heuristics:
+AI heuristics are provided in the `evaluator.py` module as pure functions:
 
-| Method | Description | Interpretation |
-|--------|-------------|----------------|
-| `get_max_tile()` | Highest tile value | Higher = better progress |
-| `get_smoothness()` | Sum of differences between adjacent tiles | Lower = smoother board |
-| `get_monotonicity()` | Measure of monotonic rows/columns | Higher = better organization |
-| `get_merge_potential()` | Count of possible merges | Higher = more opportunities |
-| `get_corner_weight()` | Weighted sum favoring corners | Higher = high tiles in corners |
-| `get_position_weights()` | Weighted sum with snake pattern | Higher = good tile placement |
-| `count_distinct_tiles()` | Number of different tile values | Lower = more consolidated |
-| `get_empty_count()` | Number of empty cells | Higher = more space |
+| Function | Description | Interpretation |
+|----------|-------------|----------------|
+| `get_smoothness(state)` | Sum of differences between adjacent tiles | Lower = smoother board |
+| `get_monotonicity(state)` | Measure of monotonic rows/columns | Higher = better organization |
+| `get_merge_potential(state)` | Count of possible merges | Higher = more opportunities |
+| `get_corner_weight(state)` | Weighted sum favoring corners | Higher = high tiles in corners |
+| `get_position_weights(state)` | Weighted sum with snake pattern | Higher = good tile placement |
+| `count_distinct_tiles(state)` | Number of different tile values | Lower = more consolidated |
+| `is_symmetric(state)` | Check for board symmetry | For search optimization |
 
-See `game_core.py` for detailed mathematical definitions and examples.
+**Usage:**
+```python
+import evaluator
+from game_core import GameState
+
+score = (
+    evaluator.get_position_weights(state) +
+    evaluator.get_monotonicity(state) * 1.0 -
+    evaluator.get_smoothness(state) * 0.1
+)
+```
+
+**Convenience function:**
+```python
+# Use with default weights
+score = evaluator.evaluate_state(state)
+
+# Or customize weights
+score = evaluator.evaluate_state(state, {
+    'position': 1.0,
+    'monotonicity': 1.0,
+    'smoothness': -0.1,  # negative because lower is better
+    'empty_cells': 100.0,
+    'merge_potential': 10.0
+})
+```
+
+See `evaluator.py` for detailed mathematical definitions and examples.
 
 ## Tree Search Helpers
 
@@ -236,9 +262,11 @@ print(f"Rollout result: {final_state.score}")
 
 ```
 65536-game/
-├── game_core.py           # Core game logic (AI-optimized)
+├── game_core.py           # Core game logic (game mechanics only)
+├── evaluator.py           # AI evaluation functions (heuristics)
 ├── player_interface.py    # Abstract Player class
 ├── random_ai_player.py    # Baseline Random AI
+├── human_player.py        # Tkinter GUI for human play
 ├── main.py                # Game runner & benchmarking
 ├── examples/              # Example AI implementations
 │   ├── heuristic_ai.py    # Simple greedy AI

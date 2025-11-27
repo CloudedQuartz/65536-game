@@ -2,8 +2,14 @@
 Simple Expectimax AI - Tree search with depth 2.
 """
 
+import sys
+from pathlib import Path
+# Add parent directory to path so we can import from root
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from player_interface import Player
 from game_core import GameState, Direction, Game
+import evaluator
 
 
 class ExpectimaxAI(Player):
@@ -51,25 +57,15 @@ class ExpectimaxAI(Player):
         return best
     
     def _evaluate(self, state: GameState) -> float:
-        """Heuristic evaluation."""
+        """Heuristic evaluation using evaluator module."""
         return (
-            state.get_position_weights() +
-            state.get_monotonicity() * 1.0 +
+            evaluator.get_position_weights(state) +
+            evaluator.get_monotonicity(state) * 1.0 +
             state.get_empty_count() * 100.0 -
-            state.get_smoothness() * 0.1
+            evaluator.get_smoothness(state) * 0.1
         )
     
     def on_move_result(self, result): pass
     def on_game_over(self, state): pass
     def reset(self): pass
 
-
-if __name__ == "__main__":
-    from game_core import SpawnMode
-    from main import run_game
-    
-    game = Game(spawn_mode=SpawnMode.CLASSIC, seed=42)
-    player = ExpectimaxAI(game, depth=2)
-    final = run_game(game, player)
-    
-    print(f"\nFinal: {final.score:,} points, max tile {final.get_max_tile()}")

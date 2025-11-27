@@ -2,8 +2,14 @@
 Simple Heuristic AI - Evaluates each move with a weighted score.
 """
 
+import sys
+from pathlib import Path
+# Add parent directory to path so we can import from root
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from player_interface import Player
 from game_core import GameState, Direction, Game
+import evaluator
 
 
 class HeuristicAI(Player):
@@ -18,12 +24,12 @@ class HeuristicAI(Player):
         best_score = float('-inf')
         
         for direction, new_state in self.game.move_engine.get_all_move_outcomes(state).items():
-            # Combine multiple heuristics
+            # Combine multiple heuristics using evaluator module
             score = (
-                new_state.get_position_weights() +
-                new_state.get_monotonicity() * 1.0 +
+                evaluator.get_position_weights(new_state) +
+                evaluator.get_monotonicity(new_state) * 1.0 +
                 new_state.get_empty_count() * 100.0 -
-                new_state.get_smoothness() * 0.1
+                evaluator.get_smoothness(new_state) * 0.1
             )
             
             if score > best_score:
@@ -36,13 +42,3 @@ class HeuristicAI(Player):
     def on_game_over(self, state): pass
     def reset(self): pass
 
-
-if __name__ == "__main__":
-    from game_core import SpawnMode
-    from main import run_game
-    
-    game = Game(spawn_mode=SpawnMode.CLASSIC, seed=42)
-    player = HeuristicAI(game)
-    final = run_game(game, player)
-    
-    print(f"\nFinal: {final.score:,} points, max tile {final.get_max_tile()}")
