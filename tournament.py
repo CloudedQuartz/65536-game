@@ -99,23 +99,24 @@ def run_tournament(games_per_agent: int = 10, mode: str = 'classic'):
             'Max Score': max_score,
             'Best Tile': best_tile,
             '2048+ %': (wins_2048 / games_per_agent) * 100,
+            '65536+ %': (wins_65536 / games_per_agent) * 100,
             'Avg Time': avg_time_per_game
         })
     
     # Print Results Table
     print("\n\n🏆 TOURNAMENT RESULTS 🏆")
-    print("=" * 80)
+    print("=" * 95)
     
     # Sort by Avg Score descending
     results.sort(key=lambda x: x['Avg Score'], reverse=True)
     
     # Header
-    headers = ['Agent', 'Avg Score', 'Max Score', 'Best Tile', '2048+ %', 'Avg Time (s)']
+    headers = ['Agent', 'Avg Score', 'Max Score', 'Best Tile', '2048+ %', '65536+ %', 'Avg Time (s)']
     
     # Simple table formatting
-    row_format = "{:<25} {:<12} {:<12} {:<10} {:<10} {:<12}"
+    row_format = "{:<25} {:<12} {:<12} {:<10} {:<10} {:<10} {:<12}"
     print(row_format.format(*headers))
-    print("-" * 80)
+    print("-" * 95)
     
     for r in results:
         print(row_format.format(
@@ -124,9 +125,10 @@ def run_tournament(games_per_agent: int = 10, mode: str = 'classic'):
             f"{r['Max Score']}",
             f"{r['Best Tile']}",
             f"{r['2048+ %']:.0f}%",
+            f"{r['65536+ %']:.0f}%",
             f"{r['Avg Time']:.2f}"
         ))
-    print("=" * 80)
+    print("=" * 95)
 
 
 if __name__ == "__main__":
