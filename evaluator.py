@@ -287,6 +287,33 @@ def is_symmetric(state: GameState) -> bool:
     return h_sym or v_sym
 
 
+def get_gradient_score(state: GameState) -> float:
+    """
+    Calculate score based on a gradient weight matrix.
+    
+    This forces a 'snake' pattern where high values are pushed to one corner
+    and decrease monotonically along a winding path.
+    
+    Weights (targeting top-left):
+        [[ 65536, 32768, 16384, 8192 ],
+         [   512,  1024,  2048, 4096 ],
+         [   256,   128,    64,   32 ],
+         [     2,     4,     8,   16 ]]
+         
+    Returns:
+        Weighted sum of tile values
+    """
+    # Gradient weights favoring top-left corner in snake pattern
+    weights = np.array([
+        [65536, 32768, 16384, 8192],
+        [  512,  1024,  2048, 4096],
+        [  256,   128,    64,   32],
+        [    2,     4,     8,   16]
+    ], dtype=np.float64)
+    
+    return float(np.sum(state.grid * weights))
+
+
 # Convenience function for combined evaluation
 def evaluate_state(state: GameState, weights: dict = None) -> float:
     """
@@ -299,30 +326,22 @@ def evaluate_state(state: GameState, weights: dict = None) -> float:
     
     Returns:
         Combined evaluation score
-        
-    Example:
-        score = evaluate_state(state, {
-            'position': 1.0,
-            'monotonicity': 1.0,
-            'smoothness': -0.1,  # negative because lower is better
-            'empty_cells': 100.0,
-            'merge_potential': 10.0
-        })
     """
     if weights is None:
-        # Default weights (same as used in examples)
+        # Default weights
         weights = {
-            'position': 1.0,
-            'monotonicity': 1.0,
-            'smoothness': -0.1,  # Negative because lower smoothness is better
-            'empty_cells': 100.0,
-            'merge_potential': 10.0
+            'gradient': 1.0,      # Strong snake pattern
+            'empty_cells': 100.0, # Survival
+            'smoothness': -0.1,   # Local mergeability
         }
     
     score = 0.0
     
     if 'position' in weights:
         score += get_position_weights(state) * weights['position']
+        
+    if 'gradient' in weights:
+        score += get_gradient_score(state) * weights['gradient']
     
     if 'monotonicity' in weights:
         score += get_monotonicity(state) * weights['monotonicity']
