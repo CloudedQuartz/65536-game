@@ -190,6 +190,19 @@ class GameState:
             # Combine with score
             self._hash = grid_hash ^ hash(self.score)
         return self._hash
+
+    @property
+    def cache_key(self) -> int:
+        """
+        Get a hash key for caching that ignores score.
+        
+        This is useful for transposition tables where we only care about
+        the grid configuration, not the current score.
+        
+        Returns:
+            Hash of the grid bytes
+        """
+        return hash(self.grid.tobytes())
     
     def to_tuple(self) -> Tuple:
         """

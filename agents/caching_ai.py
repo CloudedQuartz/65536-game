@@ -64,9 +64,9 @@ class CachingAI(Player):
     
     def _expect_value(self, state: GameState, depth: int, prob: float) -> float:
         """Compute expected value with caching."""
-        # Check cache (key: state + depth)
+        # Check cache (key: state_hash + depth)
         # We include depth because a deeper search is more accurate
-        cache_key = (state, depth)
+        cache_key = (state.cache_key, depth)
         if cache_key in self.transposition_table:
             return self.transposition_table[cache_key]
         
@@ -96,7 +96,7 @@ class CachingAI(Player):
     
     def _max_value(self, state: GameState, depth: int, prob: float) -> float:
         """Maximize player move."""
-        cache_key = (state, depth)
+        cache_key = (state.cache_key, depth)
         if cache_key in self.transposition_table:
             return self.transposition_table[cache_key]
             
