@@ -193,7 +193,7 @@ AI heuristics are provided in the `evaluator.py` module as pure functions:
 | `get_monotonicity(state)` | Measure of monotonic rows/columns | Higher = better organization |
 | `get_merge_potential(state)` | Count of possible merges | Higher = more opportunities |
 | `get_corner_weight(state)` | Weighted sum favoring corners | Higher = high tiles in corners |
-| `get_position_weights(state)` | Weighted sum with snake pattern | Higher = good tile placement |
+| `get_gradient_score(state)` | Weighted sum with snake pattern | Higher = good tile placement |
 | `count_distinct_tiles(state)` | Number of different tile values | Lower = more consolidated |
 | `is_symmetric(state)` | Check for board symmetry | For search optimization |
 
@@ -203,7 +203,7 @@ import evaluator
 from game_core import GameState
 
 score = (
-    evaluator.get_position_weights(state) +
+    evaluator.get_gradient_score(state) * 1.0 +
     evaluator.get_monotonicity(state) * 1.0 -
     evaluator.get_smoothness(state) * 0.1
 )
@@ -216,7 +216,7 @@ score = evaluator.evaluate_state(state)
 
 # Or customize weights
 score = evaluator.evaluate_state(state, {
-    'position': 1.0,
+    'gradient': 1.0,
     'monotonicity': 1.0,
     'smoothness': -0.1,  # negative because lower is better
     'empty_cells': 100.0,
@@ -268,10 +268,19 @@ print(f"Rollout result: {final_state.score}")
 ├── random_ai_player.py    # Baseline Random AI
 ├── human_player.py        # Tkinter GUI for human play
 ├── main.py                # Game runner & benchmarking
-├── examples/              # Example AI implementations
+├── tournament.py          # Tournament runner & plotting
+├── run_ai.py              # Universal AI runner script
+├── agents/                # Advanced AI Implementations
+│   ├── stochastic_ai.py          # Standard Expectimax
+│   ├── stochastic_gradient_ai.py # Expectimax + Gradient Heuristic
+│   ├── caching_ai.py             # Transposition Table Optimization
+│   ├── dynamic_depth_ai.py       # Variable Depth Search
+│   ├── dynamic_pruning_ai.py     # Variable Pruning Thresholds
+│   └── dynamic_hybrid_ai.py      # Combined Dynamic Strategy
+├── examples/              # Simple Example AIs
 │   ├── heuristic_ai.py    # Simple greedy AI
 │   └── expectimax_ai.py   # Basic tree search AI
-├── requirements.txt       # Dependencies (numpy)
+├── requirements.txt       # Dependencies (numpy, matplotlib)
 └── README.md              # This file
 ```
 
@@ -296,6 +305,37 @@ python -m main
 ```
 
 This will run 100 games with RandomAI and print statistics.
+
+## Advanced AI Agents
+
+The `agents/` directory contains a progression of sophisticated AI implementations:
+
+1.  **`StochasticAI`**: Standard Expectimax with probability-based pruning.
+2.  **`StochasticGradientAI`**: Adds a highly optimized "Gradient" heuristic (Snake pattern) for better tile organization.
+3.  **`CachingAI`**: Adds a Transposition Table (Zobrist hashing) to cache board states. This provides a **~2x speedup**, allowing for deeper search (Depth 4) in the same time.
+4.  **`DynamicDepthAI`**: Adjusts search depth (3-6) based on board emptiness. Fast in early game, deep in late game.
+5.  **`DynamicHybridAI`**: The current SOTA. Combines:
+    - **Gradient Heuristic** (Organization)
+    - **Transposition Table** (Speed)
+    - **Dynamic Depth** (3-6 based on complexity)
+    - **Dynamic Pruning** (Variable risk tolerance)
+
+## Tournament & Benchmarking
+
+Use `tournament.py` to compare agents head-to-head.
+
+```bash
+# Run a 5-game tournament
+python tournament.py --games 5
+
+# Run in Dynamic Mode (1/16th rule)
+python tournament.py --games 10 --mode dynamic
+```
+
+**Features:**
+- Runs games in parallel (conceptually)
+- Tracks Win Rate (2048+ and 65536+)
+- Generates a **Score vs Time** plot (`benchmark_results.png`) to visualize the efficiency trade-offs.
 
 ## Future Development
 

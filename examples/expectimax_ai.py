@@ -59,7 +59,7 @@ class ExpectimaxAI(Player):
     def _evaluate(self, state: GameState) -> float:
         """Heuristic evaluation using evaluator module."""
         return (
-            evaluator.get_position_weights(state) +
+            evaluator.get_gradient_score(state) * 2.0 +
             evaluator.get_monotonicity(state) * 1.0 +
             state.get_empty_count() * 100.0 -
             evaluator.get_smoothness(state) * 0.1
@@ -68,4 +68,3 @@ class ExpectimaxAI(Player):
     def on_move_result(self, result): pass
     def on_game_over(self, state): pass
     def reset(self): pass
-

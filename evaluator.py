@@ -199,47 +199,6 @@ def get_corner_weight(state: GameState) -> float:
     return weight
 
 
-def get_position_weights(state: GameState) -> float:
-    """
-    Weighted sum using position heuristics.
-    
-    Definition:
-        Each position has a weight encouraging a snake pattern
-        (highest tiles along edges, building toward one corner).
-        
-    Weight matrix (targeting top-left corner):
-        [[2^15, 2^14, 2^13, 2^12],
-         [2^8,  2^9,  2^10, 2^11],
-         [2^7,  2^6,  2^5,  2^4],
-         [2^0,  2^1,  2^2,  2^3]]
-        
-    Returns:
-        Position-weighted sum
-        
-    Complexity: O(1) - fixed 4x4 grid
-    
-    Interpretation:
-        - Higher values = tiles arranged in good pattern (good)
-        - Encourages snake/monotonic pattern from corner
-        
-    Example:
-        Best pattern:
-        [[1024, 512, 256, 128],
-         [  16,  32,  64,  64],  -> Very high position weight
-         [   8,   4,   4,  32],
-         [   2,   2,   2,  16]]
-    """
-    # Snake pattern weights (powers of 2)
-    weights = np.array([
-        [2**15, 2**14, 2**13, 2**12],
-        [2**8,  2**9,  2**10, 2**11],
-        [2**7,  2**6,  2**5,  2**4],
-        [2**0,  2**1,  2**2,  2**3]
-    ], dtype=np.float64)
-    
-    return float(np.sum(state.grid * weights))
-
-
 def count_distinct_tiles(state: GameState) -> int:
     """
     Count number of distinct tile values.
@@ -347,7 +306,8 @@ def evaluate_state(state: GameState, weights: dict = None) -> float:
         score += state.get_empty_count() * weights['empty_cells']
         
     if weights.get('position', 0) != 0:
-        score += get_position_weights(state) * weights['position']
+        # 'position' is deprecated, mapped to gradient
+        score += get_gradient_score(state) * (weights['position'] * 0.5)
     
     if weights.get('monotonicity', 0) != 0:
         score += get_monotonicity(state) * weights['monotonicity']
