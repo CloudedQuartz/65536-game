@@ -41,7 +41,7 @@ class StochasticAI(Player):
         
         # Standard weights (Position + Monotonicity + Smoothness)
         self.weights = {
-            'position': 1.0,
+            'gradient': 1.0,      # Strong snake pattern
             'monotonicity': 1.0,
             'smoothness': -0.1,
             'empty_cells': 100.0,
